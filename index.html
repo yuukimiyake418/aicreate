@@ -1,0 +1,789 @@
+<!DOCTYPE html>
+<html lang="ja">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TSUMUGI | 伝統と革新の融合</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+JP:wght@300;400;500;700&display=swap"
+        rel="stylesheet">
+
+    <style>
+        /* --- 基本設定 --- */
+        :root {
+            --bg-color: #f4f3ef;
+            /* 和紙のような生成り色 */
+            --text-color: #2b2b2b;
+            /* 墨色 */
+            --accent-color: #1e384c;
+            /* 藍色（深い青） */
+            --sub-color: #8c8c8c;
+            /* 銀鼠 */
+            --font-main: 'Noto Serif JP', serif;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+        body {
+            font-family: var(--font-main);
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            line-height: 2;
+            letter-spacing: 0.1em;
+            overflow-x: hidden;
+            overflow-y: hidden;
+            /* ローディング中はスクロール禁止 */
+        }
+
+        body.loaded {
+            overflow-y: auto;
+        }
+
+        a {
+            text-decoration: none;
+            color: inherit;
+            transition: opacity 0.3s;
+        }
+
+        a:hover {
+            opacity: 0.6;
+        }
+
+       
+
+        /* --- アニメーション定義 --- */
+        .fade-up {
+            opacity: 0;
+            transform: translateY(40px);
+            transition: opacity 1.2s cubic-bezier(0.22, 1, 0.36, 1), transform 1.2s cubic-bezier(0.22, 1, 0.36, 1);
+        }
+
+        .fade-up.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .delay-1 {
+            transition-delay: 0.2s;
+        }
+
+        .delay-2 {
+            transition-delay: 0.4s;
+        }
+
+        header .logo,
+        header nav li {
+            opacity: 0;
+            transform: translateY(-20px);
+            transition: opacity 0.8s ease-out, transform 0.8s ease-out;
+        }
+
+        body.loaded header .logo {
+            opacity: 1;
+            transform: translateY(0);
+            transition-delay: 0.5s;
+        }
+
+        body.loaded header nav li:nth-child(1) {
+            opacity: 1;
+            transform: translateY(0);
+            transition-delay: 0.6s;
+        }
+
+        body.loaded header nav li:nth-child(2) {
+            opacity: 1;
+            transform: translateY(0);
+            transition-delay: 0.7s;
+        }
+
+        body.loaded header nav li:nth-child(3) {
+            opacity: 1;
+            transform: translateY(0);
+            transition-delay: 0.8s;
+        }
+
+        body.loaded header nav li:nth-child(4) {
+            opacity: 1;
+            transform: translateY(0);
+            transition-delay: 0.9s;
+        }
+
+
+        /* 画像のパララックス/ズーム効果用 */
+        .img-wrapper {
+            overflow: hidden;
+            display: block;
+            background-color: #ddd;
+            /* 画像読み込み前の背景色 */
+        }
+
+        .img-wrapper img {
+            transition: transform 2s ease;
+            width: 100%;
+            height: auto;
+            display: block;
+            transform: scale(1.02);
+        }
+
+        .img-wrapper:hover img {
+            transform: scale(1.08);
+        }
+
+        /* --- ヘッダー --- */
+        header {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            padding: 30px 50px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            z-index: 100;
+            mix-blend-mode: difference;
+            color: #fff;
+        }
+
+        .logo {
+            font-size: 1.5rem;
+            font-weight: 700;
+            letter-spacing: 0.2em;
+        }
+
+        nav ul {
+            list-style: none;
+            display: flex;
+            gap: 30px;
+        }
+
+        nav ul li a {
+            font-size: 0.9rem;
+            position: relative;
+        }
+
+        nav ul li a::after {
+            content: '';
+            position: absolute;
+            bottom: -5px;
+            left: 0;
+            width: 0;
+            height: 1px;
+            background-color: #fff;
+            transition: width 0.3s;
+        }
+
+        nav ul li a:hover::after {
+            width: 100%;
+        }
+
+
+        /* --- メインビジュアル (Hero) --- */
+        .hero {
+            height: 100vh;
+            position: relative;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            overflow: hidden;
+        }
+
+        .hero-bg {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            /* 修正: 確実に表示されるpicsum画像に変更（森林のイメージ） */
+            background-image: url('https://images.unsplash.com/photo-1506806732259-39c2d0268443?q=80&w=2072&auto=format&fit=crop');
+            background-size: cover;
+            background-position: center;
+            filter: brightness(0.7) grayscale(40%);
+            z-index: -1;
+            animation: subtleZoom 25s infinite alternate ease-in-out;
+        }
+
+        @keyframes subtleZoom {
+            from {
+                transform: scale(1);
+            }
+
+            to {
+                transform: scale(1.15);
+            }
+        }
+
+        .hero-content {
+            writing-mode: vertical-rl;
+            color: #fff;
+            margin-right: -20px;
+            opacity: 0;
+        }
+
+        body.loaded .hero-content {
+            opacity: 1;
+            transition: opacity 1s 0.8s;
+        }
+
+        .hero h1 {
+            font-size: 3rem;
+            margin-left: 20px;
+            letter-spacing: 0.5em;
+            text-shadow: 2px 2px 10px rgba(0, 0, 0, 0.5);
+        }
+
+        .hero h1 span {
+            display: inline-block;
+            opacity: 0;
+            transform: translateY(20px);
+            transition: opacity 0.8s, transform 0.8s;
+        }
+
+        body.loaded .hero h1 span:nth-child(1) {
+            opacity: 1;
+            transform: translateY(0);
+            transition-delay: 1s;
+        }
+
+        body.loaded .hero h1 span:nth-child(2) {
+            opacity: 1;
+            transform: translateY(0);
+            transition-delay: 1.3s;
+        }
+
+        .hero p {
+            font-size: 1.1rem;
+            margin-left: 30px;
+            color: rgba(255, 255, 255, 0.9);
+            opacity: 0;
+            transform: translateY(20px);
+            transition: opacity 0.8s 1.8s, transform 0.8s 1.8s;
+        }
+
+        body.loaded .hero p {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+
+        /* --- 共通セクションスタイル --- */
+        section {
+            padding: 140px 10%;
+        }
+
+        .section-title {
+            font-size: 2rem;
+            margin-bottom: 70px;
+            text-align: center;
+            font-weight: 500;
+        }
+
+        .section-title span {
+            display: block;
+            font-size: 0.8rem;
+            color: var(--sub-color);
+            margin-top: 15px;
+            font-family: sans-serif;
+            letter-spacing: 0.25em;
+        }
+
+        /* --- 哲学 (Philosophy) --- */
+        .philosophy {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        .philosophy p {
+            margin-bottom: 35px;
+            font-size: 1.05rem;
+        }
+
+        /* --- 作品 (Works) --- */
+        .works-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 50px;
+        }
+
+        .work-item {
+            cursor: pointer;
+        }
+
+        .work-image {
+            aspect-ratio: 3/4;
+            margin-bottom: 25px;
+        }
+
+        .work-image img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .work-info h3 {
+            font-size: 1.2rem;
+            margin-bottom: 8px;
+            font-weight: 500;
+        }
+
+        .work-info p {
+            color: var(--sub-color);
+            font-size: 0.9rem;
+            font-family: sans-serif;
+        }
+
+        /* --- 職人体験 (Workshop) --- */
+        .workshop-container {
+            display: flex;
+            gap: 60px;
+            align-items: center;
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+
+        .workshop-image {
+            flex: 1;
+            aspect-ratio: 4/3;
+        }
+
+        .workshop-image img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            filter: saturate(0.8);
+        }
+
+        .workshop-details {
+            flex: 1;
+        }
+
+        .workshop-details h3 {
+            font-size: 1.5rem;
+            margin-bottom: 30px;
+        }
+
+        .info-list dl {
+            display: flex;
+            flex-wrap: wrap;
+            margin-bottom: 30px;
+            border-top: 1px solid #ddd;
+        }
+
+        .info-list dt {
+            width: 30%;
+            padding: 15px 0;
+            font-weight: 500;
+            border-bottom: 1px solid #ddd;
+        }
+
+        .info-list dd {
+            width: 70%;
+            padding: 15px 0;
+            border-bottom: 1px solid #ddd;
+            color: #555;
+        }
+
+        /* --- お問い合わせ (Contact) --- */
+        .contact {
+            background-color: var(--accent-color);
+            color: #fff;
+            text-align: center;
+            padding-bottom: 160px;
+        }
+
+        .contact .section-title span {
+            color: rgba(255, 255, 255, 0.6);
+        }
+
+        .contact p {
+            margin-bottom: 40px;
+        }
+
+        .btn {
+            display: inline-block;
+            border: 1px solid #fff;
+            padding: 18px 70px;
+            transition: all 0.4s ease;
+            position: relative;
+            overflow: hidden;
+            z-index: 1;
+        }
+
+        .btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background-color: #fff;
+            transition: left 0.4s ease;
+            z-index: -1;
+        }
+
+        .btn:hover {
+            color: var(--accent-color);
+        }
+
+        .btn:hover::before {
+            left: 0;
+        }
+
+        .btn-dark {
+            border-color: var(--accent-color);
+            color: var(--accent-color);
+        }
+
+        .btn-dark::before {
+            background-color: var(--accent-color);
+        }
+
+        .btn-dark:hover {
+            color: #fff;
+        }
+
+        /* --- フッター --- */
+        footer {
+            padding: 40px;
+            text-align: center;
+            font-size: 0.8rem;
+            color: var(--sub-color);
+            background-color: #152a3a;
+        }
+
+        /* --- レスポンシブ --- */
+        @media (max-width: 768px) {
+            header {
+                padding: 20px 30px;
+            }
+
+            .logo {
+                font-size: 1.2rem;
+            }
+
+            nav ul {
+                gap: 15px;
+            }
+
+            nav ul li a {
+                font-size: 0.8rem;
+            }
+
+            .hero h1 {
+                font-size: 2rem;
+            }
+
+            section {
+                padding: 100px 5%;
+            }
+
+            .philosophy {
+                text-align: left;
+            }
+
+            .hero-content {
+                writing-mode: horizontal-tb;
+                text-align: center;
+            }
+
+            .hero h1 {
+                margin-left: 0;
+                margin-bottom: 20px;
+            }
+
+            .hero h1 span {
+                display: block;
+            }
+
+            .hero p {
+                margin-left: 0;
+            }
+
+            .workshop-container {
+                flex-direction: column;
+                gap: 40px;
+            }
+
+            .info-list dt,
+            .info-list dd {
+                width: 100%;
+                padding: 10px 0;
+            }
+
+            .info-list dt {
+                border-bottom: none;
+                padding-bottom: 0;
+                color: var(--accent-color);
+            }
+        }
+
+        /* --- ローディング画面 --- */
+        #loading {
+            /* 画面全体に固定 */
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            /* 藍色の背景 */
+            background-color: #1e384c;
+            z-index: 9999;
+            display: flex;
+            flex-direction: column;
+            /* 要素を縦に並べる */
+            justify-content: center;
+            align-items: center;
+            /* 画面遷移時のフェードアウトアニメーション */
+            opacity: 1;
+            visibility: visible;
+            transition: opacity 0.8s ease-out, visibility 0.8s ease-out;
+        }
+
+        body.loaded #loading {
+            opacity: 0;
+            visibility: hidden;
+            pointer-events: none;
+            /* クリックを無効にする */
+        }
+
+        /* ローディングテキスト */
+        #loading p {
+            color: #f4f3ef;
+            /* 生成り色 */
+            margin-top: 30px;
+            font-family: 'Noto Serif JP', serif;
+            font-size: 1.1rem;
+            letter-spacing: 0.2em;
+        }
+
+        /* 墨流し（筆の動き）アニメーション */
+        .brush-stroke {
+            width: 80px;
+            height: 80px;
+            /* 墨色をイメージした白 */
+            border: 3px solid rgba(255, 255, 255, 0.9);
+            border-radius: 50%;
+            /* アニメーションの対象となる境界線 */
+            border-top-color: transparent;
+            border-right-color: transparent;
+
+            /* 筆の動きを表現するアニメーション */
+            animation: spin 1.5s cubic-bezier(0.68, -0.55, 0.27, 1.55) infinite,
+                /* 独特なイージングで手書き感を出す */
+                fadeInOut 3s infinite;
+            /* 明滅で墨が水に溶ける様子を表現 */
+        }
+
+        @keyframes spin {
+            to {
+                transform: rotate(360deg);
+            }
+        }
+
+        @keyframes fadeInOut {
+
+            0%,
+            100% {
+                opacity: 0.8;
+            }
+
+            50% {
+                opacity: 0.4;
+            }
+        }
+
+        /* --- bodyの初期設定 (CSSの先頭付近に追記) --- */
+        body {
+            /* ローディング中はスクロール禁止 */
+            overflow-y: hidden;
+        }
+
+        body.loaded {
+            /* 読み込み完了後にスクロール許可 */
+            overflow-y: auto;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="loading">
+        <div class="brush-stroke"></div>
+        <p>Loading...</p>
+    </div>
+
+    <header>
+        <div class="logo">TSUMUGI</div>
+        <nav>
+            <ul>
+                <li><a href="#philosophy">想い</a></li>
+                <li><a href="#works">作品</a></li>
+                <li><a href="#workshop">体験</a></li>
+                <li><a href="#contact">便り</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <div class="hero">
+        <div class="hero-bg"></div>
+        <div class="hero-content fade-up">
+            <h1>時を紡ぐ、<br>技と心。</h1>
+            <p>伝統を現代の暮らしへ。</p>
+        </div>
+    </div>
+
+    <section id="philosophy" class="philosophy">
+        <h2 class="section-title fade-up">
+            手仕事の温もり
+            <span>PHILOSOPHY</span>
+        </h2>
+        <p class="fade-up delay-1">
+            機械では再現できない「揺らぎ」があります。<br>
+            それは、職人が長い年月をかけて培った指先の感覚と、<br>
+            素材そのものが持つ声に耳を傾けた結果です。
+        </p>
+        <p class="fade-up delay-2">
+            私たちは、古くから伝わる日本の技法を守りながら、<br>
+            現代の住空間に静かに溶け込む道具を作っています。<br>
+            使うほどに手に馴染み、景色が変わっていく。<br>
+            そんな「育てる」喜びをお届けします。
+        </p>
+    </section>
+
+    <section id="works">
+        <h2 class="section-title fade-up">
+            珠玉の逸品
+            <span>WORKS</span>
+        </h2>
+        <div class="works-grid">
+            <div class="work-item fade-up">
+                <div class="img-wrapper work-image">
+                    <img src="https://picsum.photos/id/113/600/800" alt="黒釉の花器">
+                </div>
+                <div class="work-info">
+                    <h3>黒釉の広口花器</h3>
+                    <p>Pottery / Black Glaze</p>
+                </div>
+            </div>
+            <div class="work-item fade-up delay-1">
+                <div class="img-wrapper work-image">
+                    <img src="https://picsum.photos/id/1060/600/800" alt="無垢材の盆">
+                </div>
+                <div class="work-info">
+                    <h3>欅の拭き漆盆</h3>
+                    <p>Woodwork / Zelkova</p>
+                </div>
+            </div>
+            <div class="work-item fade-up delay-2">
+                <div class="img-wrapper work-image">
+                    <img src="https://picsum.photos/id/1062/600/800" alt="藍染のストール">
+                </div>
+                <div class="work-info">
+                    <h3>本藍染の麻布</h3>
+                    <p>Textile / Indigo Dye</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section id="workshop">
+        <h2 class="section-title fade-up">
+            職人の追体験
+            <span>WORKSHOP</span>
+        </h2>
+        <div class="workshop-container">
+            <div class="img-wrapper workshop-image fade-up">
+                <img src="https://picsum.photos/id/20/800/600" alt="職人の手仕事体験">
+            </div>
+            <div class="workshop-details fade-up delay-1">
+                <h3>月例・手仕事の会</h3>
+                <p style="margin-bottom: 20px;">
+                    月に一度、工房を開放し、職人が直接手ほどきをする体験会を開催しています。
+                    素材に触れ、道具を使い、自らの手で「もの」を生み出す豊かな時間をお過ごしください。
+                </p>
+                <div class="info-list">
+                    <dl>
+                        <dt>次回内容</dt>
+                        <dd>本藍染でつくる、世界にひとつの手ぬぐい</dd>
+                        <dt>開催日時</dt>
+                        <dd>毎月第3土曜日 13:00〜16:00</dd>
+                        <dt>参加費用</dt>
+                        <dd>5,500円（税込・材料費込）</dd>
+                        <dt>定員</dt>
+                        <dd>各回 6名様（先着順）</dd>
+                    </dl>
+                </div>
+                <a href="#" class="btn btn-dark">参加を申し込む</a>
+            </div>
+        </div>
+    </section>
+
+    <section id="contact" class="contact">
+        <div class="fade-up">
+            <h2 class="section-title">
+                お問い合わせ
+                <span>CONTACT</span>
+            </h2>
+            <p>制作のご依頼、展示会、ワークショップに関するご質問はこちらから。</p>
+            <a href="#" class="btn">詳しく聞く</a>
+        </div>
+    </section>
+
+    <footer>
+        <p>&copy; 2024 TSUMUGI All Rights Reserved.</p>
+    </footer>
+
+    <script>
+        window.addEventListener('load', function () {
+            setTimeout(function () {
+                document.body.classList.add('loaded');
+            }, 800);
+        });
+
+        document.addEventListener("DOMContentLoaded", function () {
+            const targets = document.querySelectorAll('.fade-up');
+            const options = {
+                root: null,
+                rootMargin: '0px',
+                threshold: 0.15
+            };
+            const observer = new IntersectionObserver((entries, observer) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        entry.target.classList.add('visible');
+                        observer.unobserve(entry.target);
+                    }
+                });
+            }, options);
+            targets.forEach(target => {
+                observer.observe(target);
+            });
+        });
+
+        // --- ページの読み込み完了を検知 ---
+        window.addEventListener('load', function () {
+            // 0.8秒間、ローディング画面を見せるための遅延
+            setTimeout(function () {
+                // body要素に 'loaded' クラスを付与し、CSSでローディング画面を非表示にする
+                document.body.classList.add('loaded');
+            }, 800);
+        });
+
+        // 開発環境でローディングを毎回テストしたい場合は、以下のコメントを外すと便利です
+        // document.body.classList.remove('loaded');
+    </script>
+</body>
+
+</html>
