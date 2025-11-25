@@ -1,0 +1,468 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>桃源郷・ももいろ果樹園 | 旬の甘味をお届け</title>
+    <link href="https://fonts.googleapis.com/css2?family=Shippori+Mincho:wght@400;500;600&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --momoiro-dark: #D08A8A;
+            --momoiro-light: #F3E2E2;
+            --matcha: #7B906F;
+            --kinari: #FDFCF8;
+            --sumi: #333333;
+            --bg-texture: #F8F7F2;
+        }
+
+        body {
+            font-family: 'Shippori Mincho', serif;
+            background-color: var(--bg-texture);
+            background-image: 
+                radial-gradient(var(--momoiro-light) 2%, transparent 2%),
+                radial-gradient(var(--kinari) 2%, transparent 2%);
+            background-size: 20px 20px, 30px 30px;
+            color: var(--sumi);
+            margin: 0;
+            padding: 0;
+            line-height: 2;
+            letter-spacing: 0.05em;
+        }
+
+        /* --- アニメーション --- */
+        @keyframes fadeUp {
+            from { opacity: 0; transform: translateY(30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .scroll-animate {
+            opacity: 0;
+        }
+        .scroll-animate.visible {
+            animation: fadeUp 1.2s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+        }
+
+        /* --- ヘッダー --- */
+        header {
+            padding: 1.5rem 3rem;
+            position: absolute;
+            width: 100%;
+            top: 0;
+            z-index: 10;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-sizing: border-box;
+            background: linear-gradient(to bottom, rgba(255,255,255,0.8), transparent);
+        }
+
+        .logo {
+            font-size: 1.4rem;
+            font-weight: 600;
+            color: var(--sumi);
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            text-shadow: 0 0 5px white;
+        }
+        
+        .logo-icon {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 36px; height: 36px;
+            border: 2px solid var(--momoiro-dark);
+            border-radius: 50%;
+            margin-right: 10px;
+            color: var(--momoiro-dark);
+            background: rgba(255,255,255,0.8);
+        }
+
+        nav ul {
+            list-style: none;
+            display: flex;
+            gap: 2rem;
+            margin: 0; padding: 0;
+        }
+
+        nav a {
+            text-decoration: none;
+            color: var(--sumi);
+            font-size: 0.95rem;
+            font-weight: 500;
+            text-shadow: 0 0 5px white;
+        }
+
+        /* --- ファーストビュー（写真背景） --- */
+        .hero {
+            height: 90vh;
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+        }
+
+        /* 背景画像の設定 */
+        .hero-bg {
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 100%;
+            /* Unsplashの桃の画像を使用（実案件ではローカル画像に差し替え） */
+            background-image: url('https://unsplash.com/ja/%E5%86%99%E7%9C%9F/%E8%91%89%E3%81%8C%E4%B8%8A%E3%81%AB%E3%81%82%E3%82%8B%E6%A1%83%E3%81%AE%E5%B1%B1-H4QpChoce7I');
+            background-size: cover;
+            background-position: center;
+            z-index: -1;
+        }
+        
+        /* 白いフィルターをかけて文字を読みやすく、柔らかな印象に */
+        .hero-bg::after {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(253, 252, 248, 0.4); 
+            backdrop-filter: blur(2px);
+        }
+
+        .hero-content {
+            position: relative;
+            background: rgba(255, 255, 255, 0.85);
+            padding: 4rem 6rem;
+            border-radius: 4px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.05);
+            text-align: center;
+            max-width: 600px;
+        }
+
+        .hero h1 {
+            font-size: 2.2rem;
+            margin-bottom: 1.5rem;
+            line-height: 1.6;
+            color: var(--sumi);
+            border-bottom: 1px solid var(--momoiro-dark);
+            display: inline-block;
+            padding-bottom: 1rem;
+        }
+
+        .hero p {
+            font-size: 1rem;
+            margin-bottom: 0;
+        }
+
+        /* --- セクション共通 --- */
+        section {
+            padding: 6rem 2rem;
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+
+        .section-header {
+            text-align: center;
+            margin-bottom: 4rem;
+        }
+
+        .section-title {
+            font-size: 1.8rem;
+            display: inline-block;
+            border-bottom: 2px solid var(--matcha);
+            padding-bottom: 0.5rem;
+        }
+
+        /* --- ごあいさつ --- */
+        .greeting-container {
+            display: flex;
+            align-items: center;
+            gap: 4rem;
+            background: #fff;
+            padding: 3rem;
+            border-radius: 8px;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.03);
+        }
+
+        .farmer-photo {
+            flex: 0 0 300px;
+            height: 350px;
+            /* 農家さんの写真プレースホルダー */
+            background-image: url('https://unsplash.com/ja/%E5%86%99%E7%9C%9F/%E8%91%89%E3%81%8C%E4%B8%8A%E3%81%AB%E3%81%82%E3%82%8B%E6%A1%83%E3%81%AE%E5%B1%B1-H4QpChoce7I');
+            background-size: cover;
+            background-position: center;
+            border-radius: 4px;
+        }
+
+        .greeting-text h3 {
+            font-size: 1.4rem;
+            margin-bottom: 1.5rem;
+            color: var(--momoiro-dark);
+        }
+
+        /* --- 果物紹介 --- */
+        .fruit-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 2rem;
+        }
+        .fruit-card {
+            background: white;
+            padding: 2rem;
+            border: 1px solid #eee;
+            text-align: center;
+        }
+        .fruit-img-area {
+            height: 180px;
+            background: #fdfdfd;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 4rem;
+            margin-bottom: 1rem;
+            border-radius: 50%;
+            width: 180px;
+            margin: 0 auto 1.5rem;
+            border: 1px dashed var(--momoiro-dark);
+        }
+        .harvest-month {
+            background: var(--matcha);
+            color: white;
+            padding: 2px 10px;
+            font-size: 0.8rem;
+            border-radius: 15px;
+            display: inline-block;
+            margin-bottom: 0.5rem;
+        }
+
+        /* --- 体験農園 --- */
+        .experience-section {
+            background-color: white;
+            border-radius: 20px;
+            overflow: hidden;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.05);
+            display: flex;
+            flex-direction: row-reverse; /* 画像とテキストを左右に */
+        }
+        .exp-image {
+            flex: 1;
+            min-height: 300px;
+            background-image: url('https://images.unsplash.com/photo-1616499887729-16a70e608298?q=80&w=1000&auto=format&fit=crop');
+            background-size: cover;
+            background-position: center;
+        }
+        .exp-content {
+            flex: 1;
+            padding: 3rem;
+        }
+        .exp-content h3 {
+            font-size: 1.5rem;
+            color: var(--matcha);
+            margin-bottom: 1rem;
+        }
+        .exp-details {
+            margin: 1.5rem 0;
+            font-size: 0.95rem;
+            border-top: 1px solid #eee;
+            border-bottom: 1px solid #eee;
+            padding: 1rem 0;
+        }
+        .btn-reserve {
+            display: inline-block;
+            background: var(--momoiro-dark);
+            color: white;
+            padding: 0.8rem 3rem;
+            text-decoration: none;
+            border-radius: 4px;
+            transition: opacity 0.3s;
+        }
+        .btn-reserve:hover { opacity: 0.8; }
+
+        /* --- 直売所情報 --- */
+        .shop-info-wrapper {
+            background: rgba(255,255,255,0.6);
+            padding: 3rem;
+            border: 1px solid var(--momoiro-light);
+        }
+        .shop-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 2rem;
+        }
+        .shop-table th, .shop-table td {
+            border-bottom: 1px solid #ddd;
+            padding: 1rem;
+            text-align: left;
+        }
+        .shop-table th {
+            width: 30%;
+            color: var(--matcha);
+            font-weight: 600;
+        }
+
+        /* --- フッター --- */
+        footer {
+            background-color: #6d6d6d;
+            color: white;
+            padding: 3rem 1rem;
+            text-align: center;
+            margin-top: 4rem;
+        }
+        footer a { color: white; text-decoration: none; }
+
+        /* レスポンシブ */
+        @media (max-width: 768px) {
+            .hero h1 { font-size: 1.6rem; }
+            .hero-content { padding: 2rem; width: 85%; }
+            .greeting-container { flex-direction: column; gap: 2rem; }
+            .farmer-photo { width: 100%; height: 250px; }
+            .experience-section { flex-direction: column; }
+            nav ul { display: none; }
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <a href="#" class="logo">
+            <span class="logo-icon">桃</span>
+            ももいろ果樹園
+        </a>
+        <nav>
+            <ul>
+                <li><a href="#greeting">ごあいさつ</a></li>
+                <li><a href="#fruits">桃の紹介</a></li>
+                <li><a href="#experience">桃狩り</a></li>
+                <li><a href="#shop">直売所</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <main>
+        <div class="hero">
+            <div class="hero-bg"></div>
+            <div class="hero-content scroll-animate">
+                <h1>心ほどける、<br>至福の果実。</h1>
+                <p>陽光あふれる桃源郷より、<br>丹精込めた一玉をお届けします。</p>
+            </div>
+        </div>
+
+        <section id="greeting">
+            <div class="section-header scroll-animate">
+                <h2 class="section-title">園主ごあいさつ</h2>
+            </div>
+            <div class="greeting-container scroll-animate">
+                <div class="farmer-photo"></div>
+                <div class="greeting-text">
+                    <h3>「美味しい」の笑顔が見たくて。</h3>
+                    <p>ももいろ果樹園、園主の桃山です。<br>
+                    当園は三代にわたり、この土地で桃と向き合ってきました。</p>
+                    <p>自然相手の果樹栽培は、決して楽なことばかりではありません。<br>
+                    しかし、夏の盛りに真っ赤に色づいた桃を収穫し、<br>
+                    お客様が一口食べた瞬間にほころぶ笑顔を見ると、<br>
+                    それまでの苦労がすべて吹き飛びます。</p>
+                    <p>今年も、皆様に感動していただける桃をお届けできるよう、<br>
+                    一玉一玉に愛情を注いでおります。</p>
+                    <p style="text-align: right; margin-top: 1rem;">園主 桃山 太郎</p>
+                </div>
+            </div>
+        </section>
+
+        <section id="fruits">
+            <div class="section-header scroll-animate">
+                <h2 class="section-title">季節の桃たち</h2>
+                <p>時期によって変わる、味わいのリレーをお楽しみください。</p>
+            </div>
+            <div class="fruit-grid">
+                <div class="fruit-card scroll-animate">
+                    <div class="fruit-img-area">🍑</div>
+                    <span class="harvest-month">7月上旬</span>
+                    <h3>早生あかつき</h3>
+                    <p>シーズン最初の楽しみ。小ぶりながらも甘みが凝縮されています。</p>
+                </div>
+                <div class="fruit-card scroll-animate" style="animation-delay: 0.2s;">
+                    <div class="fruit-img-area">🍑</div>
+                    <span class="harvest-month">7月下旬</span>
+                    <h3>白鳳（はくほう）</h3>
+                    <p>果汁がしたたる「桃の王様」。とろける食感は絶品です。</p>
+                </div>
+                <div class="fruit-card scroll-animate" style="animation-delay: 0.4s;">
+                    <div class="fruit-img-area" style="color: #e8c46a;">🟡</div>
+                    <span class="harvest-month">8月中旬</span>
+                    <h3>黄金桃</h3>
+                    <p>マンゴーのような濃厚な香りと、鮮やかな黄色が特徴。</p>
+                </div>
+            </div>
+        </section>
+
+        <section id="experience">
+            <div class="section-header scroll-animate">
+                <h2 class="section-title">体験農園</h2>
+            </div>
+            <div class="experience-section scroll-animate">
+                <div class="exp-image"></div>
+                <div class="exp-content">
+                    <h3>畑でまるかじり！桃狩り体験</h3>
+                    <p>木の上で完熟した桃を、その場でもぎ取って食べる贅沢。<br>
+                    ご家族やご友人と、夏の思い出作りにいかがですか？</p>
+                    
+                    <div class="exp-details">
+                        <p><strong>期間：</strong> 7月10日 〜 8月20日頃</p>
+                        <p><strong>料金：</strong> 大人 1,500円 / 小人 800円（40分食べ放題）</p>
+                        <p><strong>持ち物：</strong> 動きやすい靴、帽子</p>
+                    </div>
+                    
+                    <a href="#" class="btn-reserve">Web予約する</a>
+                </div>
+            </div>
+        </section>
+
+        <section id="shop">
+            <div class="section-header scroll-animate">
+                <h2 class="section-title">直売所のご案内</h2>
+            </div>
+            <div class="shop-info-wrapper scroll-animate">
+                <table class="shop-table">
+                    <tr>
+                        <th>営業時間</th>
+                        <td>9:00 〜 16:00（売り切れ次第終了）</td>
+                    </tr>
+                    <tr>
+                        <th>定休日</th>
+                        <td>期間中は無休（雨天時も営業）</td>
+                    </tr>
+                    <tr>
+                        <th>販売期間</th>
+                        <td>7月1日 〜 8月下旬</td>
+                    </tr>
+                    <tr>
+                        <th>駐車場</th>
+                        <td>あり（10台）</td>
+                    </tr>
+                    <tr>
+                        <th>決済方法</th>
+                        <td>現金・PayPay</td>
+                    </tr>
+                </table>
+                <p style="font-size: 0.9rem;">※ 収穫状況により休園する場合もございます。当日の状況はSNSをご確認ください。</p>
+            </div>
+        </section>
+
+    </main>
+
+    <footer>
+        <div class="logo" style="justify-content: center; margin-bottom: 1rem; color: white; text-shadow: none;">
+            ももいろ果樹園
+        </div>
+        <p>〒000-0000 山梨県桃源郷市果実の里 1-2-3</p>
+        <p>&copy; Momoiro Orchard. All Rights Reserved.</p>
+    </footer>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        entry.target.classList.add('visible');
+                    }
+                });
+            }, { threshold: 0.1 });
+
+            document.querySelectorAll('.scroll-animate').forEach(el => observer.observe(el));
+        });
+    </script>
+</body>
+</html>
